@@ -2,14 +2,16 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-
+interface DeerNode{
+    function addNode(address _node) external;
+}
 contract Bind is Ownable{
     address public defaultReferrer;
     mapping(address => User) public userMap;
     address[] public users;
-
+    DeerNode deerNode;
     mapping(address => bool) public operators;
-
+    mapping(address => bool) public isNode;
     struct User{
         bool active;
         address referrer;
@@ -42,6 +44,10 @@ contract Bind is Ownable{
     //前端绑定按钮调用
     function bindRelationship(address referrer) public {
         _bindRelationship(msg.sender, referrer);
+        if(userMap[referrer].subordinates.length >= 30 && !isNode[referrer]){
+            deerNode.addNode(referrer);
+            isNode[referrer] = true;
+        }
     }
 
     function _bindRelationship(address account, address referrer) internal {

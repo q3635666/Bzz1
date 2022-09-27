@@ -33,7 +33,7 @@ contract Deer is Context, IERC20, IERC20Metadata {
     //买入手续费
     Fomo10 fomo10;
     Fomo100 fomo100;
-    address private node;
+    IBoard private node;
     uint256 public fomo10Fee = 2;
     uint256 public fomo100Fee = 3;
     uint256 public nodeFee = 2;
@@ -76,7 +76,7 @@ contract Deer is Context, IERC20, IERC20Metadata {
         address _DeerBoard
     ) public {
         LPPool = _LPPool;
-        node = _node;
+        node = IBoard(_node);
         ecology = _ecology;
         NFTBoard = IBoard(_NFTBoard);
         DeerBoard = IBoard(_DeerBoard);
@@ -148,8 +148,8 @@ contract Deer is Context, IERC20, IERC20Metadata {
         _balances[address(fomo100)] += tofomo100;
         emit Transfer(from, address(fomo100), tofomo100);
 
-        _balances[node] += nodeFee;
-        emit Transfer(from, node, nodeFee);
+        node.allocateWithToken(tonode);
+        emit Transfer(from, address(DeerBoard), tonode);
 
         amount = amount - toLPPool - tofomo10 - tofomo100 - tonode;
         _balances[to] += amount;

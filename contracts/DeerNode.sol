@@ -5,12 +5,12 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
-contract DeerBoard is Ownable{
+contract DeerNode is Ownable{
     using SafeMath for uint256;
     //node总量
     uint256 _totalSupply;
-    //地址质押数量
-    mapping(address => uint256) _balances;
+    //isnode
+    mapping (address => uint) isnode;
     //董事会席位：{
     //     最后快照索引
     //     获得奖励
@@ -40,8 +40,7 @@ contract DeerBoard is Ownable{
     //快照数组
     BoardSnapshot[] private boardHistory;
 
-    constructor(address _deer, address _rewardToken) {
-        Deer = IERC20(_deer);
+    constructor(address _rewardToken) {
         rewardToken = IERC20(_rewardToken);
         operators[_rewardToken] = true;
         BoardSnapshot memory genesisSnapshot = BoardSnapshot({
@@ -55,10 +54,6 @@ contract DeerBoard is Ownable{
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }  
-    //获取余额
-    function balanceOf(address account) public view returns (uint256) {
-        return _balances[account];
-    }
 
     modifier onlyOperator() {
         require(operators[msg.sender], 'Boardroom: Caller is not the operator');
@@ -111,15 +106,15 @@ contract DeerBoard is Ownable{
         uint256 latestRPS = getLatestSnapshot().rewardPerShare;
         uint256 storedRPS = getLastSnapshotOf(director).rewardPerShare;
 
-        uint256 rewardEarned = balanceOf(director)
-            .mul(latestRPS.sub(storedRPS)).div(1e18)
-            .add(directors[director].rewardEarned);
+        uint256 rewardEarned = isnode[director]
+            .mul(latestRPS.sub(storedRPS)).add(directors[director].rewardEarned);
         return rewardEarned;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     function addNode(address _node) public updateReward(_node) onlyOperator{
         _totalSupply ++;
+        isnode[_node] = 1;
     }
 
     function getReward() public updateReward(msg.sender) {
@@ -148,7 +143,7 @@ contract DeerBoard is Ownable{
         require(amount > 0, 'Boardroom: Cannot allocate 0');
         if(totalSupply() > 0){
             addNewSnapshot(amount);
-            if(amount>0) rewardToken.transferFrom(msg.sender, address(this), amount);
+            //if(amount>0) rewardToken.transferFrom(msg.sender, address(this), amount);
             emit RewardAdded(msg.sender, amount);
         }
     }
