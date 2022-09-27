@@ -36,6 +36,11 @@ contract Bind is Ownable{
         _;
     }
 
+    //设置节点地址
+    function setNodeAddress(address _nodeAddress) public onlyOperator{
+        deerNode = DeerNode(_nodeAddress);
+    }
+
     //操作者合约调用
     function bindRelationshipExternal(address account, address referrer) public onlyOperator {
         _bindRelationship(account, referrer);

@@ -113,6 +113,7 @@ contract DeerNode is Ownable{
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     function addNode(address _node) public updateReward(_node) onlyOperator{
+        require(isnode[_node] == 0,"Caller was node");
         _totalSupply ++;
         isnode[_node] = 1;
     }
