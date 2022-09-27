@@ -51,11 +51,11 @@ contract DeerBoard is Ownable{
         });
         boardHistory.push(genesisSnapshot);
     }
-
+    //获取总量
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
-    }
-
+    }  
+    //获取余额
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
@@ -64,7 +64,7 @@ contract DeerBoard is Ownable{
         require(operators[msg.sender], 'Boardroom: Caller is not the operator');
         _;
     }
-
+    //设置操作员
     function setOperator(address[] memory operatorList, bool flag) public onlyOwner{
         for(uint256 i=0;i<operatorList.length;i++){
             operators[operatorList[i]] = flag;
@@ -118,7 +118,7 @@ contract DeerBoard is Ownable{
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
-    function stake(uint256 amount) public updateReward(msg.sender) {
+    function Stake(uint256 amount) public updateReward(msg.sender) {
         require(amount > 0, 'Boardroom: Cannot stake 0');
         require(amount <= Deer.balanceOf(msg.sender), 'Boardroom: Stake amount exceeds balance');
         Deer.transferFrom(msg.sender, address(this), amount);
